@@ -13,7 +13,7 @@ fi
 
 if [ "$disk" -ge "80" ]
 then
-	notify-send -u critical "The DISC Almost Filled: $disk"
+	notify-send -u critical "The DISK Almost Filled: $disk"
 fi
 
 
