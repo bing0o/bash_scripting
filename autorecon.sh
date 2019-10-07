@@ -8,18 +8,21 @@ purple="\e[35m"
 read -p "[+] Enter Domain: " domain
 
 # link: https://github.com/Edu4rdSHL/findomain
-echo -e $cyan"[*] Start Findomain"$end
+echo -e $cyan"[*] Start Findomain"$end # Getting a list of subdomains
 findomain -t $domain -o &>/dev/null
-echo "	* Results saved in: $domain.txt"
+size=$(wc -l $domain.txt)
+echo "[+] Results: $size"
 
 # link: https://github.com/bing0o/Python-Scripts/blob/master/subchecker.py
-echo -e $cyan"[*] Start Subchecker"$end
+echo -e $cyan"[*] Start Subchecker"$end # Filter the result and save only the live subdomains
 subchecker -w "$domain.txt" -t 30 -o "$domain-checked" &>/dev/null
-echo "	* Results saved in: $domain-checked"
+size=$(wc -l $domain-checked)
+echo "[+] Results: $size"
 
 # link: https://github.com/bing0o/Python-Scripts/blob/master/webtech.py
-echo -e $cyan"[*] Start WebTech"$end
+echo -e $cyan"[*] Start WebTech"$end # Getting the technologies that running in each subdomain
 webtech -w "$domain-checked" -t 30 -o "$domain-Tech" -i &>/dev/null
-echo "	* Results saved in: $domain-Tech"
+size=$(wc -l $domain-Tech)
+echo "[+] Results: $size"
 
 echo -e $purple"[!] You Did Nothing Yet,Go Deeper!"$end
