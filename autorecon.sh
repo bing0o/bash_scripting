@@ -9,7 +9,7 @@ read -p "[+] Enter Domain: " domain
 
 # https://github.com/s0md3v/Photon
 echo ""
-echo -e $cyan"[*] Start Photon"$end # Getting a list of subdomains
+echo -e $cyan"[*] Start Photon"$end # Mapping the target application
 tmux split-window -h "photon '-u $domain -t 30 --wayback --dns --keys'; echo '[+] Done!'; read"
 echo "[!] Running in New Tmux Pane!"
 #echo "[+] Results: In $domain Folder"
