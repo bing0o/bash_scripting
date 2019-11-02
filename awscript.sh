@@ -2,9 +2,9 @@
 
 # cat ips | xargs -I% sh -c "host %"
 # -z True if it's a zero | -n True if it's not a zero!
-[ -z $1 ] && echo "#Usage: awscript.sh <domains/ips>" && exit 
+[ -z $1 ] && { echo "#Usage: awscript.sh <domains/ips>" >&2; exit 1; }
 
-lines=$(wc -l $1 | awk '{print $1}')
+lines=$(wc -l < $1)
 c=1
 while read line; do 
 	echo -ne "[$c/$lines] $line                                                 \r"
