@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mem=$(free -m | awk 'NR==2{printf("%d\n", $3*100/$2)}')
-disk=$(df -h | awk '$NF=="/"{print $5}' | awk -F% '{print $1}')
+disk=$(df -h | awk '$NF=="/" {sub(/%/, "", $5); print $5}')
 cpu=$(grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage ""}' | awk -F. '{print $1}')
 
 if [ "$cpu" -ge "80" ]
