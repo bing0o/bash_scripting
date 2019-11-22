@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+# script to encrypt all the files in a specific directory, using crypto.py python script.
+#
+# wget https://raw.githubusercontent.com/bing0o/Python-Scripts/master/crypto.py
+# chmod +x crypto.py
+# sudo cp crypto.py /usr/local/bin/crypto
+#
+# change the default password!.
 
 if [ -z $1 ] 
 then 
