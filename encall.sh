@@ -18,6 +18,7 @@ fi
 
 if [ "$1" == "e" ]
 then
+        #use find instead of ls 
 	ls * | grep -v ".hacklab$" | xargs -I% bash -c "echo -ne \"[+] Processing: %                                             \r\" && if [ -f % ]; then crypto -e % -p $password -x 1>/dev/null; fi"
 fi
 
