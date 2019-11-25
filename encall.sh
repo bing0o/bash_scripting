@@ -8,23 +8,20 @@
 #
 # change the default password!.
 
-if [ -z $1 ] 
-then 
-	echo "#Usage: encall <OPTIONS (e/d)> <PASSWORD, default (P4ssw@rD)>"
-	exit 1
-fi
+Do()
+{
+	setterm -linewrap off
+	find -maxdepth 1 \( -type f $1 -name '*.hacklab'\
+		-exec crypto $1 {} -p ${2:-P4ssw@rD} -x 1>/dev/null \;\
+		-exec tput el \; \) -printf "%p\r"
+	setterm -linewrap on
+	printf "[*] Done!\n"
+}
 
-[[ -z $2 ]] && password="P4ssw@rD" || password=$2
-
-if [ "$1" == "e" ]
-then
-        #use find instead of ls 
-	ls * | grep -v ".hacklab$" | xargs -I% bash -c "echo -ne \"[+] Processing: %                                             \r\" && if [ -f % ]; then crypto -e % -p $password -x 1>/dev/null; fi"
-fi
-
-if [ "$1" == "d" ]
-then
-	ls *.hacklab | xargs -I% bash -c "echo -ne \"[+] Processing: %                                                    \r\" ;crypto -d % -p $password -x 1>/dev/null"
-fi
-echo -ne "[*] Done!                                        \r"
-echo ""
+case $1 in
+	   e) Do -not -e ;;
+	   d) Do ' ' -d ;;
+	''|*)
+		echo "Usage: encall <OPTIONS (e/d)> <PASSWORD, default (P4ssw@rD)>"
+		exit 1 ;;
+esac
