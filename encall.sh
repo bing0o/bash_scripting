@@ -15,12 +15,14 @@ Do()
 		-exec crypto $1 {} -p ${2:-P4ssw@rD} -x 1>/dev/null \;\
 		-exec tput el \; \) -printf "%p\r"
 	setterm -linewrap on
-	printf "[*] Done!\n"
+	echo "[*] Done!"
 }
 
 case $1 in
-	   e) Do -not -e ;;
-	   d) Do ' ' -d ;;
+	e)
+		Do -not -e ;;
+	d)
+		Do ' ' -d ;;
 	''|*)
 		echo "Usage: encall <OPTIONS (e/d)> <PASSWORD, default (P4ssw@rD)>"
 		exit 1 ;;
