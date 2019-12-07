@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "terminalforlife",
+      "name": "Terminal for Life",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/31768530?v=4",
+      "profile": "https://www.youtube.com/channel/UCfp-lNJy4QkIGnaEE6NtDSg",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "bash_scripting",
+  "projectOwner": "bing0o",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
