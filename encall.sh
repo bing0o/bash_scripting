@@ -15,7 +15,7 @@
 # WARNING: Change the default password!
 #----------------------------------------------------------------------------------
 
-CurVer='2019-12-09'
+CurVer='2019-12-13'
 Progrm=${0##*/}
 
 Err(){
@@ -71,21 +71,25 @@ while [ "$1" ]; do
 				Password=$1
 			fi ;;
 		-*)
-			Err 1 "Invalid argument(s) detected -- see: '$'" ;;
+			Usage; exit 0 ;;
 		*)
 			break ;;
 	esac
 	shift
 done
 
+if ! command -v crypto 1> /dev/null 2>&1; then
+	Err 1 "Dependency 'crypto' not met."
+fi
+
 for CurFile in ./*; do
 	[ -f "$CurFile" ] || continue
 
-	# Ignore `*.hacklab` files if encrypting.
+	# Ignore `*.hacklab` if encrypting, but ignore everything else if decrypting.
 	if [ "$Action" = '-e' ]; then
-		case $CurFile in
-			*.hacklab) continue ;;
-		esac
+		[ "${CurFile##*.}" = 'hacklab' ] && continue
+	elif [ "$Action" = '-d' ]; then
+		[ "${CurFile##*.}" = 'hacklab' ] || continue
 	fi
 
 	printf "[+] %s: %s\n" "$Actioning" "$CurFile"
