@@ -71,7 +71,7 @@ while [ "$1" ]; do
 				Password=$1
 			fi ;;
 		-*)
-			Usage; exit 0 ;;
+			Usage; exit 1 ;;
 		*)
 			break ;;
 	esac
