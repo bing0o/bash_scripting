@@ -84,7 +84,7 @@ elif [ $# -eq 0 ]; then
 	Usage; exit 1
 fi
 
-for CurFile in ./*; do
+for CurFile in "$@"; do
 	[ -f "$CurFile" ] || continue
 
 	# Ignore `*.hacklab` if encrypting, but ignore everything else if decrypting.
