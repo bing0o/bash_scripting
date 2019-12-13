@@ -78,7 +78,9 @@ while [ "$1" ]; do
 	shift
 done
 
-if ! command -v crypto 1> /dev/null 2>&1; then
+if [ $# -eq 0 ]; then
+	Usage; exit 1
+elif ! command -v crypto 1> /dev/null 2>&1; then
 	Err 1 "Dependency 'crypto' not met."
 fi
 
