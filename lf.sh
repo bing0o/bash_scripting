@@ -17,4 +17,4 @@ echo -e $u
 
 [ $1 != "f" ] && [ $1 != "d" ] && { Usage; exit 1; }
 #echo $path
-ls -a $path | grep -v "^\.\.$\|^\.$" | xargs -I% bash -c "[ -$1 $path/'%' ] && ls -d $path/'%'" | awk -F/ '{print $NF}' 
+ls -a $path | grep -v "^\.\.$\|^\.$" | xargs -I% bash -c "[ -$1 $path/'%' ] && echo '%'" 
