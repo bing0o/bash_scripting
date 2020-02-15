@@ -19,12 +19,12 @@ install
 
 echo "[+] Start AssetFinder."
 assetfinder -subs-only $domain > domains
-$results=$(wc -l domains)
+results=$(wc -l domains)
 echo "[=+] Results: " $results
 
 echo -e "\n[+] Start HTTPRobe."
 cat domains | httprobe > hosts
-$results=$(wc -l hosts)
+results=$(wc -l hosts)
 echo "[=+] Results: " $results
 
 echo -e "\n[+] Start Meg."
