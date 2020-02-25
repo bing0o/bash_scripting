@@ -19,8 +19,8 @@ Usage () {
 }
 
 case $1 in
-	 f|d|L|p|S|b) Type=$1 ;;
-	*|'') Usage; exit 1 ;;
+	 [fdLpSb]) Type=$1 ;;
+	*) Usage; exit 1 ;;
 esac
 
 for CurFile in ${2:-.}/.* ${2:-.}/* ; do
