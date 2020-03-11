@@ -34,6 +34,3 @@ echo -e $cyan"[*] Start WebTech"$end # Getting the technologies that running in 
 webtech -w "$domain-checked" -t 30 -o "$domain-Tech" -i 1>/dev/null
 size=$(wc -l $domain-Tech)
 echo "[+] Results: $size"
-
-echo ""
-echo -e $purple"[!] You Did Nothing Yet,Go Deeper!"$end
