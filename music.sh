@@ -13,40 +13,42 @@ cyan="\e[36m"
 end="\e[0m"
 
 MUSIC () {
-pick=${music[$num]}
+	pick=${music[$num]}
 
-echo -e $cyan"\n[+] The Songs: "$end ${#music[@]}
-echo -e $cyan"[+] The Picked Number: "$end $num 
-echo -e $cyan"[+] The Picked Song: "$end $(echo "$pick" | awk -F/ '{print $NF}')
+	echo -e $cyan"\n[+] The Songs: "$end ${#music[@]}
+	echo -e $cyan"[+] The Picked Number: "$end $num
+	echo -e $cyan"[+] The Picked Song: "$end ${pick##*/}
 
-pkill vlc
+	pkill vlc
 
-[ "$1" == "vlc" ] && { vlc "$pick" &>/dev/null & } || { cvlc "$pick" --play-and-exit &>/dev/null & }
-
+	case $1 in
+		vlc) vlc "$pick" &>/dev/null & ;;
+		  *) cvlc "$pick" --play-and-exit &>/dev/null & ;;
+	esac
 }
 
-[ "$1" == "-h" ] && { 
+[ "$1" == "-h" ] && {
 echo -e "#Usage:
 \tmusic <PATH> <EXTENSION> <vlc> <list>\n
 \t<PATH>\t\tThe Path To Your Music Directory.
 \t<EXTENSION>\tThe Extension of The Files (mp3, mp4, avi,....etc, or \"*\" to load all the files)
 \t<vlc>\t\tEnter 'vlc' to run the music or the video clip with vlc GUI.
 \t<list>\t\tEnter 'list' to list all the songs and pick the music by yourself.
-"; 
-exit; 
+"
+exit
 }
 
 # change the default path here!
-[ -z $1 ] || [ "$1" == "." ] && path="/home/bingo/Music" || path=$1
-[ -z "$2" ] || [ "$2" == "." ] && ext="mp3" || ext="$2" 
+[ -z "$1" ] || [ "$1" == "." ] && path="$HOME/Music" || path=$1
+[ -z "$2" ] || [ "$2" == "." ] && ext="mp3" || ext=$2
 
 m=0
-for i in $path/*.$ext; do 
-	[ -f "$i" ] && music[$m]="$i"
-	[ "$4" == "list" ] && echo "[$m] $(echo $i | awk -F/ '{print $NF}')"
+for i in "$path"/*."$ext"; do
+	[ -f "$i" ] && music[$m]=$i
+	[ "$4" == "list" ] && echo "[$m] ${i##*/}"
 	let m+=1
 done
 
-[ "$4" == "list" ] && read -p "[+] Pick a Song: " num || num=$[ $RANDOM % $m ]
+[ "$4" == "list" ] && read -p "[+] Pick a Song: " num || num=$[ RANDOM % m ]
 
 MUSIC "$3"
