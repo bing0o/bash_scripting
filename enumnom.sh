@@ -33,6 +33,8 @@ meg -d 1000 -v /
 echo -e "\n[!] Changing The Directory To ./out"
 cd out
 
+
+# changed the name of `gf` to `gff` since I already have a linux tool called gf! 
 echo -e "\n[*] The OutPut For aws-keys"
 gff aws-keys
 
