@@ -1,37 +1,190 @@
 #!/bin/bash
 #
-# script for subdomain enumeration using 4 of the best tools:
+# script for subdomain enumeration using 4 of the best tools with some APIs:
 #   * findomain: https://github.com/Edu4rdSHL/findomain
 #   * SubFinder: https://github.com/projectdiscovery/subfinder
 #   * Amass: https://github.com/OWASP/Amass
 #   * AssetFinder: https://github.com/tomnomnom/assetfinder
 #
-[ -z $1 ] && { echo "[!] Usage: ./domains.sh <DOMAIN>"; exit 1; }
 
-echo "[+] Findomain"
-findomain -t $1 -o &>/dev/null
-res=$(wc -l $1.txt)
-echo "[*] Results: " $res
+bold="\e[1m"
+Underlined="\e[4m"
+red="\e[31m"
+green="\e[32m"
+blue="\e[34m"
+#grey="\e[90m"
+end="\e[0m"
 
-echo -e "\n[+] SubFinder"
-subfinder -silent -d $1 1> tmp-subfinder 2>/dev/null
-res=$(wc -l tmp-subfinder)
-echo "[*] Results: " $res
+echo -e $blue$bold"
+ ____                        _       _____                       
+|  _ \  ___  _ __ ___   __ _(_)_ __ | ____|_ __  _   _ _ __ ___  
+| | | |/ _ \| '_ \` _ \ / _\` | | '_ \|  _| | '_ \| | | | '_ \` _
+| |_| | (_) | | | | | | (_| | | | | | |___| | | | |_| | | | | | |
+|____/ \___/|_| |_| |_|\__,_|_|_| |_|_____|_| |_|\__,_|_| |_| |_|
+                    By: bing0o @hack1lab
+"$end
 
-echo -e "\n[+] Amass"
-amass enum -norecursive -noalts -d $1 1> tmp-amass 2>/dev/null
-res=$(wc -l tmp-amass)
-echo "[*] Results: " $res
+Usage(){
+	echo -e "$blue
+#Options:
+	-d/--domain\t Domain To Enumerate
+	-u/--use\t Functions To Be Used ex(findomain,subfinder,...,etc)
+	-e/--exclude\t Functions To Be Excluded ex(findomain,amass,...,etc)
+	-o/--output\t The output file to save the Final Results
+	-k/--keep\t To Keep the TMPs files (the results from each tool).
 
-echo -e "\n[+] Assetfinder"
-assetfinder --subs-only $1 > tmp-assetfinder
-res=$(wc -l tmp-assetfinder)
-echo "[*] Results: " $res
+#Available Functions:
+	wayback,crt,bufferover,Findomain,Subfinder,Amass,Assetfinder
+
+#Example:
+	To use a specific Functions:
+		$0 -d hackerone.com -u findomain,wayback,subfinder
+	To exclude a specific Functions:
+		$0 -d hackerone.com -e amass,assetfinder
+	To use all the Functions:
+		$0 -d hackerone.com 
+	"$end
+	exit 1
+}
 
 
-cat $1.txt tmp-* | sort -u > alldomains-$1
-res=$(wc -l alldomains-$1)
-echo -e "\n[+] The Final Results:" $res
+wayback() { 
+	echo -e $bold"[+] WayBackMachine"$end
+	curl -sk "http://web.archive.org/cdx/search/cdx?url=*.$domain&output=txt&fl=original&collapse=urlkey&page=" | awk -F/ '{print $3}' | sed 's/:.*//g' | sort -u > tmp-wayback
+	echo -e $green"[*] Results:$end " $(wc -l tmp-wayback)	
+}
 
-#rm $1.txt tmp-*
+crt() {
+	echo -e $bold"\n[+] Crt.sh"$end
+	curl -sk "https://crt.sh/?q=%.$domain&output=json&exclude=expired" | tr ',' '\n' | grep "name_value" | awk -F'"' '{print $4}' | sed 's/\\n/\n/g' | sed 's/*\.//g' | sort -u > tmp-crt
+	echo -e $green"[*] Results:$end " $(wc -l tmp-crt)	
+}
 
+bufferover() {
+	echo -e $bold"\n[+] BufferOver"$end
+	curl -s "https://dns.bufferover.run/dns?q=.$domain" | grep $domain | sed 's/"//g' | awk -F, '{print $2}' | sort -u > tmp-bufferover
+	echo -e $green"[*] Results:$end " $(wc -l tmp-bufferover)	
+}
+
+Findomain() {
+	echo -e $bold"\n[+] Findomain"$end
+	findomain -t $domain -u tmp-findomain &>/dev/null
+	res=$(wc -l tmp-findomain)
+	echo -e $green"[*] Results:$end " $res
+}
+
+Subfinder() {
+	echo -e $bold"\n[+] SubFinder"$end
+	subfinder -silent -d $domain 1> tmp-subfinder 2>/dev/null
+	res=$(wc -l tmp-subfinder)
+	echo -e $green"[*] Results:$end " $res
+}
+
+
+
+Amass() {
+	echo -e $bold"\n[+] Amass"$end
+	amass enum -norecursive -noalts -d $domain 1> tmp-amass 2>/dev/null
+	res=$(wc -l tmp-amass)
+	echo -e $green"[*] Results:$end " $res
+}
+
+Assetfinder() {
+	echo -e $bold"\n[+] Assetfinder"$end
+	assetfinder --subs-only $domain > tmp-assetfinder
+	res=$(wc -l tmp-assetfinder)
+	echo -e $green"[*] Results:$end " $res
+}
+
+domain=False
+use=False
+exclude=False
+delete=True
+out=False
+
+list=(
+	wayback
+	crt
+	bufferover
+	Findomain 
+	Subfinder 
+	Amass 
+	Assetfinder
+	)
+
+while [ -n "$1" ]; do
+	case "$1" in
+		-d|--domain)
+			domain=$2
+			shift ;;
+		-u|--use)
+			use=$2
+			lu=$(echo $use | tr ',' ' ')
+			for i in $lu; do
+				if [[ ! " ${list[@]} " =~ " ${i} " ]]; then
+					echo -e $red$Underlined"[-] Unknown Function: $i"$end
+					Usage
+				fi
+			done
+			shift ;;
+		-e|--exclude)
+			exclude=$2
+			le=$(echo $exclude | tr ',' ' ')
+			for i in $le; do
+				if [[ ! " ${list[@]} " =~ " ${i} " ]]; then
+					echo -e $red$Underlined"[-] Unknown Function: $i"$end
+					Usage
+				fi
+			done
+			shift ;;
+		-o|--output)
+			out=$2
+			shift ;;
+		-k|--keep)
+			delete=False
+			shift;;
+		-h|--help)
+			Usage;;
+		*)
+			echo "[-] Unknown Option: $1"
+			Usage;;
+	esac
+	shift
+done
+
+[ $domain == False ] && { echo -e $red"[-] Argument -d/--domain is Required"$end; Usage; }
+[ $use == False ] && [ $exclude == False ] && { 
+	wayback
+	crt
+	bufferover
+	Findomain 
+	Subfinder 
+	Amass 
+	Assetfinder
+}
+
+[ $use != False ] && [ $exclude != False ] && { echo -e $Underlined$red"[!] You can use only one Option: -e/--exclude OR -u/--use"$end; Usage; }
+
+[ $use != False ] && { 
+	for i in $lu; do
+		$i
+	done
+}
+
+[ $exclude != False ] && {
+	for i in ${list[@]}; do
+		if [[ " ${le[@]} " =~ " ${i} " ]]; then
+			continue
+		else
+			$i
+		fi
+	done
+}
+
+
+[ $out == False ] && out="alldomains-$domain"
+cat tmp-* | sort -u > $out
+res=$(wc -l $out)
+echo -e $green$bold$Underlined"\n[+] The Final Results:$end $res\n"
+
+[ $delete == True ] && rm tmp-*
