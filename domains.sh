@@ -7,93 +7,106 @@
 #   * AssetFinder: https://github.com/tomnomnom/assetfinder
 #
 
-bold="\e[1m"
-Underlined="\e[4m"
-red="\e[31m"
-green="\e[32m"
-blue="\e[34m"
-#grey="\e[90m"
-end="\e[0m"
+Progrm=${0##*/}
 
-echo -e $blue$bold"
- ____                        _       _____                       
-|  _ \  ___  _ __ ___   __ _(_)_ __ | ____|_ __  _   _ _ __ ___  
-| | | |/ _ \| '_ \` _ \ / _\` | | '_ \|  _| | '_ \| | | | '_ \` _
-| |_| | (_) | | | | | | (_| | | | | | |___| | | | |_| | | | | | |
-|____/ \___/|_| |_| |_|\__,_|_|_| |_|_____|_| |_|\__,_|_| |_| |_|
-                    By: bing0o @hack1lab
-"$end
+# Support tput(1) for portability, if found, else use ANSI escape sequences.
+if type -fP tput &> /dev/null; then
+	bold=`tput smso`;       underlined=`tput smul`;     red=`tput setaf 1`
+	blue=`tput setaf 4;     end=`tput cnorm`;           green=`tput setaf 2`
+	#grey=`tput setaf 7`
+else
+	bold='\e[1m';           underlined='\e[4m';         red='\e[31m'
+	green='\e[32m';         blue='\e[34m';              end='\e[0m'
+	#grey='\e[90m'
+fi
+
+while read; do
+	printf "$blue$bold%s$end\n" "$REPLY"
+done <<-EOF
+	 ____                        _       _____
+	|  _ \  ___  _ __ ___   __ _(_)_ __ | ____|_ __  _   _ _ __ ___
+	| | | |/ _ \| '_ \` _ \ / _\` | | '_ \|  _| | '_ \| | | | '_ \` _
+	| |_| | (_) | | | | | | (_| | | | | | |___| | | | |_| | | | | | |
+	|____/ \___/|_| |_| |_|\__,_|_|_| |_|_____|_| |_|\__,_|_| |_| |_|
+	                    By: bing0o @hack1lab
+EOF
 
 Usage(){
-	echo -e "$blue
-#Options:
-	-d/--domain\t Domain To Enumerate
-	-u/--use\t Functions To Be Used ex(Findomain,Subfinder,...,etc)
-	-e/--exclude\t Functions To Be Excluded ex(Findomain,Amass,...,etc)
-	-o/--output\t The output file to save the Final Results
-	-k/--keep\t To Keep the TMPs files (the results from each tool).
+	while read; do
+		printf "$blue%s$end\n" "$REPLY" 1>&2
+	done <<-EOF
+		#Synopsis:
+		  $Progrm [OPTS]
 
-#Available Functions:
-	wayback,crt,bufferover,Findomain,Subfinder,Amass,Assetfinder
+		#Options:
+		  -h, --help               - Display this help information.
+		  -d, --domain D           - Enumerate the D domain.
+		  -e, --exclude F          - Comma-separated excluded functions.
+		  -k, --keep               - Keep temporary result files of each tool.
+		  -o, --output FILE        - Save final results to FILE.
+		  -u, --use F              - Comma-separated used functions.
 
-#Example:
-	To use a specific Functions:
-		$0 -d hackerone.com -u Findomain,wayback,Subfinder
-	To exclude a specific Functions:
-		$0 -d hackerone.com -e Amass,Assetfinder
-	To use all the Functions:
-		$0 -d hackerone.com 
-	"$end
+		#Functions:
+		  Wayback, CRT, Bufferover, Findomain, Subfinder, Amass, Assetfinder
+
+		#Examples:
+		  Use specific functions:
+		    $Progrm -d hackerone.com -u Findomain,Wayback,Subfinder
+		  Exclude specific functions:
+		    $Progrm -d hackerone.com -e Amass,Assetfinder
+		  Use all functions:
+		    $Progrm -d hackerone.com
+	EOF
+
 	exit 1
 }
 
-
-wayback() { 
-	echo -e $bold"[+] WayBackMachine"$end
-	curl -sk "http://web.archive.org/cdx/search/cdx?url=*.$domain&output=txt&fl=original&collapse=urlkey&page=" | awk -F/ '{gsub(/:.*/, "", $3); print $3}' | sort -u > tmp-wayback
-	echo -e $green"[*] Results:$end " $(wc -l tmp-wayback)	
+Wayback() {
+	printf "$bold[+] WayBackMachine$end\n"
+	curl -sk "http://web.archive.org/cdx/search/cdx?url=*."\
+		"$domain&output=txt&fl=original&collapse=urlkey&page=" |
+		awk -F/ '{gsub(/:.*/, "", $3); print $3}' | sort -u > tmp-wayback
+	printf "$green[*] Results:$end %s\n" "$(wc -l tmp-wayback)"
 }
 
-crt() {
-	echo -e $bold"\n[+] Crt.sh"$end
-	curl -sk "https://crt.sh/?q=%.$domain&output=json&exclude=expired" | tr ',' '\n' | grep "name_value" | awk -F'"' '{gsub("*.", "", $4); gsub(/\\n/,"\n",$4);print $4}' | sort -u > tmp-crt
-	echo -e $green"[*] Results:$end " $(wc -l tmp-crt)	
+CRT() {
+	printf "$bold\n[+] Crt.sh$end\n"
+	curl -sk "https://crt.sh/?q=%.$domain&output=json&exclude=expired" |
+		tr ',' '\n' | grep "name_value" |
+		awk -F'"' '{gsub("*.", "", $4); gsub(/\\n/,"\n",$4); print $4}' |
+		sort -u > tmp-crt
+	printf "$green[*] Results:$end %s\n" "$(wc -l tmp-crt)"
 }
 
-bufferover() {
-	echo -e $bold"\n[+] BufferOver"$end
-	curl -s "https://dns.bufferover.run/dns?q=.$domain" | grep $domain | awk -F, '{gsub("\"", "", $2); print $2}' | sort -u > tmp-bufferover
-	echo -e $green"[*] Results:$end " $(wc -l tmp-bufferover)	
+Bufferover() {
+	printf "$bold\n[+] BufferOver$end"
+	curl -s "https://dns.bufferover.run/dns?q=.$domain" | grep $domain |
+		awk -F, '{gsub("\"", "", $2); print $2}' | sort -u > tmp-bufferover
+	printf "$green[*] Results:$end %s\n" "$(wc -l tmp-bufferover)"
 }
 
 Findomain() {
-	echo -e $bold"\n[+] Findomain"$end
+	printf "$bold\n[+] Findomain$end"
 	findomain -t $domain -u tmp-findomain &>/dev/null
-	res=$(wc -l tmp-findomain)
-	echo -e $green"[*] Results:$end " $res
+	printf "$green[*] Results:$end %s\n" "$(wc -l tmp-findomain)"
 }
 
 Subfinder() {
-	echo -e $bold"\n[+] SubFinder"$end
+	printf "$bold\n[+] SubFinder$end"
 	subfinder -silent -d $domain 1> tmp-subfinder 2>/dev/null
-	res=$(wc -l tmp-subfinder)
-	echo -e $green"[*] Results:$end " $res
+	printf "$green[*] Results:$end %s\n" "$(wc -l tmp-subfinder)"
 }
 
-
-
 Amass() {
-	echo -e $bold"\n[+] Amass"$end
+	printf "$bold\n[+] Amass$end\n"
 	amass enum -norecursive -noalts -d $domain 1> tmp-amass 2>/dev/null
-	res=$(wc -l tmp-amass)
-	echo -e $green"[*] Results:$end " $res
+	printf "$green[*] Results:$end %s\n" "$(wc -l tmp-amass)"
 }
 
 Assetfinder() {
-	echo -e $bold"\n[+] Assetfinder"$end
+	printf "$bold\n[+] Assetfinder$end\n"
 	assetfinder --subs-only $domain > tmp-assetfinder
-	res=$(wc -l tmp-assetfinder)
-	echo -e $green"[*] Results:$end " $res
+	printf "$green[*] Results:$end %s\n" "$(wc -l tmp-assetfinder)"
 }
 
 domain=False
@@ -102,18 +115,10 @@ exclude=False
 delete=True
 out=False
 
-list=(
-	wayback
-	crt
-	bufferover
-	Findomain 
-	Subfinder 
-	Amass 
-	Assetfinder
-	)
+list=(Wayback CRT Bufferover Findomain Subfinder Amass Assetfinder)
 
 while [ -n "$1" ]; do
-	case "$1" in
+	case $1 in
 		-d|--domain)
 			domain=$2
 			shift ;;
@@ -122,7 +127,7 @@ while [ -n "$1" ]; do
 			lu=${use//,/ }
 			for i in $lu; do
 				if [[ ! " ${list[@]} " =~ " ${i} " ]]; then
-					echo -e $red$Underlined"[-] Unknown Function: $i"$end
+					printf "$red$underlined[-] Unknown Function: $i$end\n" 1>&2
 					Usage
 				fi
 			done
@@ -132,7 +137,7 @@ while [ -n "$1" ]; do
 			le=${exclude//,/ }
 			for i in $le; do
 				if [[ ! " ${list[@]} " =~ " ${i} " ]]; then
-					echo -e $red$Underlined"[-] Unknown Function: $i"$end
+					printf "$red$underlined[-] Unknown Function: $i$end\n" 1>&2
 					Usage
 				fi
 			done
@@ -142,49 +147,54 @@ while [ -n "$1" ]; do
 			shift ;;
 		-k|--keep)
 			delete=False
-			shift;;
+			shift ;;
 		-h|--help)
-			Usage;;
+			Usage ;;
 		*)
-			echo "[-] Unknown Option: $1"
-			Usage;;
+			printf "[-] Unknown Option: $1\n"
+			Usage ;;
 	esac
 	shift
 done
 
-[ $domain == False ] && { echo -e $red"[-] Argument -d/--domain is Required"$end; Usage; }
-[ $use == False ] && [ $exclude == False ] && { 
-	wayback
-	crt
-	bufferover
-	Findomain 
-	Subfinder 
-	Amass 
+if [ $domain == False ]; then
+	printf "$red[-] Argument -d/--domain is Required$end\n" 1>&2
+	Usage
+fi
+
+if [ $use == False ] && [ $exclude == False ]; then
+	Wayback
+	CRT
+	Bufferover
+	Findomain
+	Subfinder
+	Amass
 	Assetfinder
-}
+fi
 
-[ $use != False ] && [ $exclude != False ] && { echo -e $Underlined$red"[!] You can use only one Option: -e/--exclude OR -u/--use"$end; Usage; }
+if ! [ $use == False -a $exclude == False ]; then
+	printf "$underlined$red[!] You can use only one Option:"\
+		"-e/--exclude OR -u/--use$end\n" 1>&2
 
-[ $use != False ] && { 
+	Usage
+fi
+
+if [ $use != False ]; then
 	for i in $lu; do
 		$i
 	done
-}
+fi
 
-[ $exclude != False ] && {
+if [ $exclude != False ]; then
 	for i in ${list[@]}; do
-		if [[ " ${le[@]} " =~ " ${i} " ]]; then
-			continue
-		else
-			$i
-		fi
-	done
-}
+		[[ " ${le[@]} " =~ " ${i} " ]] && continue
 
+		$i
+	done
+fi
 
 [ $out == False ] && out="alldomains-$domain"
 sort -u tmp-* > $out
-res=$(wc -l $out)
-echo -e $green$bold$Underlined"\n[+] The Final Results:$end $res\n"
+printf "$green$bold$underlined\n[+] The Final Results:$end %s\n\n" "$(wc -l $out)"
 
 [ $delete == True ] && rm tmp-*
