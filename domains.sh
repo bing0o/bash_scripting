@@ -119,7 +119,7 @@ while [ -n "$1" ]; do
 			shift ;;
 		-u|--use)
 			use=$2
-			lu=$(echo $use | tr ',' ' ')
+			lu=${use//,/ }
 			for i in $lu; do
 				if [[ ! " ${list[@]} " =~ " ${i} " ]]; then
 					echo -e $red$Underlined"[-] Unknown Function: $i"$end
@@ -129,7 +129,7 @@ while [ -n "$1" ]; do
 			shift ;;
 		-e|--exclude)
 			exclude=$2
-			le=$(echo $exclude | tr ',' ' ')
+			le=${exclude//,/ }
 			for i in $le; do
 				if [[ ! " ${list[@]} " =~ " ${i} " ]]; then
 					echo -e $red$Underlined"[-] Unknown Function: $i"$end
