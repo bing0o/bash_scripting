@@ -72,16 +72,16 @@ Wayback() {
 CRT() {
 	printf "$bold\n[+] Crt.sh$end\n"
 	curl -sk "https://crt.sh/?q=%.$domain&output=json&exclude=expired" |
-		tr ',' '\n' | grep "name_value" |
-		awk -F'"' '{gsub("*.", "", $4); gsub(/\\n/,"\n",$4); print $4}' |
+		tr ',' '\n' | awk -F'"' '/name_value/ {gsub(/*\./, "", $4); gsub(/\\n/,"\n",$4);print $4}' |
 		sort -u > tmp-crt
 	printf "$green[*] Results:$end %s\n" "$(wc -l tmp-crt)"
 }
 
 Bufferover() {
 	printf "$bold\n[+] BufferOver$end"
-	curl -s "https://dns.bufferover.run/dns?q=.$domain" | grep $domain |
-		awk -F, '{gsub("\"", "", $2); print $2}' | sort -u > tmp-bufferover
+	curl -s "https://dns.bufferover.run/dns?q=.$domain" |
+		awk -F, "/$domain/ "'{gsub("\"", "", $2); print $2}' |
+		sort -u > tmp-bufferover
 	printf "$green[*] Results:$end %s\n" "$(wc -l tmp-bufferover)"
 }
 
