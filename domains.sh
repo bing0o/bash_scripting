@@ -56,13 +56,13 @@ wayback() {
 
 crt() {
 	echo -e $bold"\n[+] Crt.sh"$end
-	curl -sk "https://crt.sh/?q=%.$domain&output=json&exclude=expired" | tr ',' '\n' | awk -F'"' '/name_value/ {gsub(/*\./, "", $4); gsub(/\\n/,"\n",$4);print $4}' | sort -u > tmp-crt
+	curl -sk "https://crt.sh/?q=%.$domain&output=json&exclude=expired" | tr ',' '\n' | awk -F'"' '/name_value/ {gsub(/\*\./, "", $4); gsub(/\\n/,"\n",$4);print $4}' | sort -u > tmp-crt
 	echo -e $green"[*] Results:$end " $(wc -l tmp-crt)	
 }
 
 bufferover() {
 	echo -e $bold"\n[+] BufferOver"$end
-	curl -s "https://dns.bufferover.run/dns?q=.$domain" | awk -F, '/$domain/ {gsub("\"", "", $2); print $2}' | sort -u > tmp-bufferover
+	curl -s "https://dns.bufferover.run/dns?q=.$domain" | grep $domain | awk -F, '{gsub("\"", "", $2); print $2}' | sort -u > tmp-bufferover
 	echo -e $green"[*] Results:$end " $(wc -l tmp-bufferover)	
 }
 
