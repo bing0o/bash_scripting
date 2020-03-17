@@ -183,7 +183,7 @@ done
 
 
 [ $out == False ] && out="alldomains-$domain"
-cat tmp-* | sort -u > $out
+sort -u tmp-* > $out
 res=$(wc -l $out)
 echo -e $green$bold$Underlined"\n[+] The Final Results:$end $res\n"
 
