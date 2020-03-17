@@ -50,19 +50,19 @@ Usage(){
 
 wayback() { 
 	echo -e $bold"[+] WayBackMachine"$end
-	curl -sk "http://web.archive.org/cdx/search/cdx?url=*.$domain&output=txt&fl=original&collapse=urlkey&page=" | awk -F/ '{print $3}' | sed 's/:.*//g' | sort -u > tmp-wayback
+	curl -sk "http://web.archive.org/cdx/search/cdx?url=*.$domain&output=txt&fl=original&collapse=urlkey&page=" | awk -F/ '{gsub(/:.*/, "", $3); print $3}' | sort -u > tmp-wayback
 	echo -e $green"[*] Results:$end " $(wc -l tmp-wayback)	
 }
 
 crt() {
 	echo -e $bold"\n[+] Crt.sh"$end
-	curl -sk "https://crt.sh/?q=%.$domain&output=json&exclude=expired" | tr ',' '\n' | grep "name_value" | awk -F'"' '{print $4}' | sed 's/\\n/\n/g' | sed 's/*\.//g' | sort -u > tmp-crt
+	curl -sk "https://crt.sh/?q=%.$domain&output=json&exclude=expired" | tr ',' '\n' | grep "name_value" | awk -F'"' '{gsub("*.", "", $4); gsub(/\\n/,"\n",$4);print $4}' | sort -u > tmp-crt
 	echo -e $green"[*] Results:$end " $(wc -l tmp-crt)	
 }
 
 bufferover() {
 	echo -e $bold"\n[+] BufferOver"$end
-	curl -s "https://dns.bufferover.run/dns?q=.$domain" | grep $domain | sed 's/"//g' | awk -F, '{print $2}' | sort -u > tmp-bufferover
+	curl -s "https://dns.bufferover.run/dns?q=.$domain" | grep $domain | awk -F, '{gsub("\"", "", $2); print $2}' | sort -u > tmp-bufferover
 	echo -e $green"[*] Results:$end " $(wc -l tmp-bufferover)	
 }
 
