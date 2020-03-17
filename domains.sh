@@ -28,8 +28,8 @@ Usage(){
 	echo -e "$blue
 #Options:
 	-d/--domain\t Domain To Enumerate
-	-u/--use\t Functions To Be Used ex(findomain,subfinder,...,etc)
-	-e/--exclude\t Functions To Be Excluded ex(findomain,amass,...,etc)
+	-u/--use\t Functions To Be Used ex(Findomain,Subfinder,...,etc)
+	-e/--exclude\t Functions To Be Excluded ex(Findomain,Amass,...,etc)
 	-o/--output\t The output file to save the Final Results
 	-k/--keep\t To Keep the TMPs files (the results from each tool).
 
@@ -38,9 +38,9 @@ Usage(){
 
 #Example:
 	To use a specific Functions:
-		$0 -d hackerone.com -u findomain,wayback,subfinder
+		$0 -d hackerone.com -u Findomain,wayback,Subfinder
 	To exclude a specific Functions:
-		$0 -d hackerone.com -e amass,assetfinder
+		$0 -d hackerone.com -e Amass,Assetfinder
 	To use all the Functions:
 		$0 -d hackerone.com 
 	"$end
@@ -56,7 +56,7 @@ wayback() {
 
 crt() {
 	echo -e $bold"\n[+] Crt.sh"$end
-	curl -sk "https://crt.sh/?q=%.$domain&output=json&exclude=expired" | tr ',' '\n' | grep "name_value" | awk -F'"' '{gsub(/*\./, "", $4); gsub(/\\n/,"\n",$4);print $4}' | sort -u > tmp-crt
+	curl -sk "https://crt.sh/?q=%.$domain&output=json&exclude=expired" | tr ',' '\n' | grep "name_value" | awk -F'"' '{gsub("*.", "", $4); gsub(/\\n/,"\n",$4);print $4}' | sort -u > tmp-crt
 	echo -e $green"[*] Results:$end " $(wc -l tmp-crt)	
 }
 
