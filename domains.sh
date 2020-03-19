@@ -11,23 +11,23 @@ Progrm=${0##*/}
 
 # Support tput(1) for portability, if found, else use ANSI escape sequences.
 if type -fP tput &> /dev/null; then
-	bold=`tput smso`;       underlined=`tput smul`;     red=`tput setaf 1`
-	blue=`tput setaf 4;     end=`tput cnorm`;           green=`tput setaf 2`
+	bold=`tput bold`;        underlined=`tput smul`;     red=`tput setaf 1`
+	blue=`tput setaf 4`;     end=`tput cnorm`;           green=`tput setaf 2`
 	#grey=`tput setaf 7`
 else
-	bold='\e[1m';           underlined='\e[4m';         red='\e[31m'
-	green='\e[32m';         blue='\e[34m';              end='\e[0m'
-	#grey='\e[90m'
+   bold='\e[1m';           underlined='\e[4m';         red='\e[31m'
+   green='\e[32m';         blue='\e[34m';              end='\e[0m'
+   #grey='\e[90m'
 fi
 
 while read; do
 	printf "$blue$bold%s$end\n" "$REPLY"
-done <<-EOF
+done <<-'EOF'
 	 ____                        _       _____
-	|  _ \  ___  _ __ ___   __ _(_)_ __ | ____|_ __  _   _ _ __ ___
-	| | | |/ _ \| '_ ` _ \ / _` | | '_ \|  _| | '_ \| | | | '_ ` _ \
+	|  _ \\  ___  _ __ ___   __ _(_)_ __ | ____|_ __  _   _ _ __ ___
+	| | | |/ _ \\| '_ ` _ \\ / _` | | '_ \\|  _| | '_ \\| | | | '_ ` _ \\
 	| |_| | (_) | | | | | | (_| | | | | | |___| | | | |_| | | | | | |
-	|____/ \___/|_| |_| |_|\__,_|_|_| |_|_____|_| |_|\__,_|_| |_| |_|
+	|____/ \\___/|_| |_| |_|\\__,_|_|_| |_|_____|_| |_|\\__,_|_| |_| |_|
 	                    By: bing0o @hack1lab
 EOF
 
@@ -61,6 +61,24 @@ Usage(){
 	exit 1
 }
 
+# Uniq-ify & count arguments, redirect to temporary file, then show result.
+UniqCount(){ # Usage: [TEMP_FILE] [SORTED_LIST]
+	TmpFile=$1; shift
+
+	declare -a DomsArr=("$@")
+	declare -i Count=0
+	for Domain in "${DomsArr[@]}"; {
+		[ "$Old" = "$Domain" ] && continue
+		printf '%s\n' "$Domain"
+		Old=$Domain
+		Count+=1
+	} > "$TmpFile"
+
+	printf "$green[*] Results:$end %'d\n" "$Count"
+
+	unset TmpFile Domain DomsArr Old
+}
+
 Wayback() {
 	printf "$bold[+] WayBackMachine$end\n"
 	curl -sk "http://web.archive.org/cdx/search/cdx?url=*."\
@@ -70,19 +88,61 @@ Wayback() {
 }
 
 CRT() {
+	URL="https://crt.sh/?q=%.$domain&output=json&exclude=expired"
+
 	printf "$bold\n[+] Crt.sh$end\n"
-	curl -sk "https://crt.sh/?q=%.$domain&output=json&exclude=expired" |
-		tr ',' '\n' | awk -F'"' '/name_value/ {gsub(/*\./, "", $4); gsub(/\\n/,"\n",$4);print $4}' |
-		sort -u > tmp-crt
-	printf "$green[*] Results:$end %s\n" "$(wc -l tmp-crt)"
+
+	DomsArr=(`
+		awk '
+			BEGIN {
+				RS = "\":\""
+				FS = "\",\""
+			}
+
+			/,"id":/ {
+				gsub(/\\\n/, " ")
+				gsub(/\*\./, "")
+				Domains[$1]++
+			}
+
+			END {
+				Sorted = asorti(Domains)
+				for(Iter = 1; Iter <= Sorted; Iter++){
+					printf("%s ", Domains[Iter])
+				}
+			}
+		' <<< "$(curl -sk "$URL")"
+	`)
+
+	UniqCount tmp-crt "${DomsArr[@]}"
 }
 
 Bufferover() {
+	URL="https://dns.bufferover.run/dns?q=.$domain"
+
 	printf "$bold\n[+] BufferOver$end"
-	curl -s "https://dns.bufferover.run/dns?q=.$domain" |
-		awk -F, "/$domain/ "'{gsub("\"", "", $2); print $2}' |
-		sort -u > tmp-bufferover
-	printf "$green[*] Results:$end %s\n" "$(wc -l tmp-bufferover)"
+
+	DomsArr=(`
+		awk '
+			BEGIN {
+				FS=","
+				RS="\""
+			}
+
+			/'"$domain"'/ {
+				Doms[$2]++
+			}
+
+			END {
+				Sorted = asorti(Doms)
+				for(Dom in Doms){
+					print(Doms[Dom])
+				}
+			}
+		' <<< "$(curl -s "$URL")"
+	`)
+
+	UniqCount tmp-bufferover "${DomsArr[@]}"
 }
 
 Findomain() {
