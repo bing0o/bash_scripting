@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #cito M:755 O:0 G:0 T:/usr/local/bin/crypto
 #----------------------------------------------------------------------------------
 # A Bourne POSIX shell script acting as a wrapper for another written in Python, -
@@ -14,8 +14,9 @@
 #
 # WARNING: Change the default password!
 #----------------------------------------------------------------------------------
-
-CurVer='2019-12-13'
+#set -x
+#CurVer='2019-12-13'
+CurVer='2020-03-19'
 Progrm=${0##*/}
 
 Err(){
@@ -42,6 +43,7 @@ Usage(){
 		\r            --encrypt|-e            - Encrypts one or more files.
 		\r            --decrypt|-d            - Decrypts one or more files.
 		\r            --password|-p STR       - Where STR is the password to use.
+		\r            --depth|-t INT          - Where INT is the Number of depth (Default:1).
 
 		\rSITE:       $Domain/bing0o/bash_scripting
 		\r            $Domain/bing0o/Python-Scripts
@@ -50,42 +52,60 @@ Usage(){
 
 Password='P4ssw@rD'
 
+if [ $# -eq 0 ]; then
+	Usage; exit 1
+fi
+
+num=1
+
 while [ "$1" ]; do
 	case $1 in
-		--help|-h|-\?)
-			Usage; exit 0 ;;
-		--version|-v)
-			printf "%s\n" "$CurVer"; exit 0 ;;
 		--encrypt|-e)
 			Action='-e'
 			Actioning='Encrypting' ;;
+			#shift ;;
 		--decrypt|-d)
 			Action='-d'
 			Actioning='Decrypting' ;;
+			#shift ;;
 		--password|-p)
 			shift
-
 			if [ -z "$1" ]; then
 				Err 1 "Password mising for the '--password|-p' option."
 			else
 				Password=$1
 			fi ;;
-		-*)
-			Usage; exit 1 ;;
+		-t|--depth)
+			num=$2
+			shift ;;
+		--help|-h|-\?)
+			Usage; exit 0 ;;
+		--version|-v)
+			printf "%s\n" "$CurVer"; exit 0 ;;
 		*)
-			break ;;
+			Usage; exit 1 ;;
 	esac
 	shift
 done
 
 if ! command -v crypto 1> /dev/null 2>&1; then
 	Err 1 "Dependency 'crypto' not met."
-elif [ $# -eq 0 ]; then
-	Usage; exit 1
 fi
 
-for CurFile in "$@"; do
-	[ -f "$CurFile" ] || continue
+list=()
+path="."
+
+for i in $(seq 1 $num); do
+	#shit
+	path=$path"/*"
+	for i in $path; do
+		[ -f "$i" ] && list+=("$i")
+	done
+done
+
+m=1
+for CurFile in "${list[@]}"; do
+	#[ -f "$CurFile" ] || continue
 
 	# Ignore `*.hacklab` if encrypting, but ignore everything else if decrypting.
 	if [ "$Action" = '-e' ]; then
@@ -94,8 +114,9 @@ for CurFile in "$@"; do
 		[ "${CurFile##*.}" = 'hacklab' ] || continue
 	fi
 
-	printf "[+] %s: %s\n" "$Actioning" "$CurFile"
-	crypto "$Action" "$CurFile" -p "$Password" -x 1> /dev/null
+	printf "[+] %s: %s\n" "$Actioning ($m/${#list[@]})" "$CurFile"
+	crypto "$Action" "$CurFile" -p "$Password" -x 1>/dev/null
+	let m+=1
 done
 
 printf "[*] Done!\n"
