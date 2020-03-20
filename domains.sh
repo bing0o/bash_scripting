@@ -6,6 +6,9 @@
 #   * Amass: https://github.com/OWASP/Amass
 #   * AssetFinder: https://github.com/tomnomnom/assetfinder
 #
+# a perl version is being developed by @terminalforlife 
+# 	* https://github.com/terminalforlife/PerlProjects/tree/master/source/dominator
+#
 
 bold="\e[1m"
 Underlined="\e[4m"
@@ -18,7 +21,7 @@ end="\e[0m"
 echo -e $blue$bold"
  ____                        _       _____                       
 |  _ \  ___  _ __ ___   __ _(_)_ __ | ____|_ __  _   _ _ __ ___  
-| | | |/ _ \| '_ \` _ \ / _\` | | '_ \|  _| | '_ \| | | | '_ \` _
+| | | |/ _ \| '_ \` _ \ / _\` | | '_ \|  _| | '_ \| | | | '_ \` _ \\
 | |_| | (_) | | | | | | (_| | | | | | |___| | | | |_| | | | | | |
 |____/ \___/|_| |_| |_|\__,_|_|_| |_|_____|_| |_|\__,_|_| |_| |_|
                     By: bing0o @hack1lab
@@ -27,11 +30,11 @@ echo -e $blue$bold"
 Usage(){
 	echo -e "$blue
 #Options:
-	-d/--domain\t Domain To Enumerate
-	-u/--use\t Functions To Be Used ex(Findomain,Subfinder,...,etc)
-	-e/--exclude\t Functions To Be Excluded ex(Findomain,Amass,...,etc)
-	-o/--output\t The output file to save the Final Results
-	-k/--keep\t To Keep the TMPs files (the results from each tool).
+	-d, --domain\t Domain To Enumerate
+	-u, --use\t Functions To Be Used ex(Findomain,Subfinder,...,etc)
+	-e, --exclude\t Functions To Be Excluded ex(Findomain,Amass,...,etc)
+	-o, --output\t The output file to save the Final Results (Default: alldomains-<TargetName>)
+	-k, --keep\t To Keep the TMPs files (the results from each tool).
 
 #Available Functions:
 	wayback,crt,bufferover,Findomain,Subfinder,Amass,Assetfinder
@@ -69,15 +72,13 @@ bufferover() {
 Findomain() {
 	echo -e $bold"\n[+] Findomain"$end
 	findomain -t $domain -u tmp-findomain &>/dev/null
-	res=$(wc -l tmp-findomain)
-	echo -e $green"[*] Results:$end " $res
+	echo -e $green"[*] Results:$end " $(wc -l tmp-findomain)
 }
 
 Subfinder() {
 	echo -e $bold"\n[+] SubFinder"$end
 	subfinder -silent -d $domain 1> tmp-subfinder 2>/dev/null
-	res=$(wc -l tmp-subfinder)
-	echo -e $green"[*] Results:$end " $res
+	echo -e $green"[*] Results:$end " $(wc -l tmp-subfinder)
 }
 
 
@@ -85,15 +86,13 @@ Subfinder() {
 Amass() {
 	echo -e $bold"\n[+] Amass"$end
 	amass enum -norecursive -noalts -d $domain 1> tmp-amass 2>/dev/null
-	res=$(wc -l tmp-amass)
-	echo -e $green"[*] Results:$end " $res
+	echo -e $green"[*] Results:$end " $(wc -l tmp-amass)
 }
 
 Assetfinder() {
 	echo -e $bold"\n[+] Assetfinder"$end
 	assetfinder --subs-only $domain > tmp-assetfinder
-	res=$(wc -l tmp-assetfinder)
-	echo -e $green"[*] Results:$end " $res
+	echo -e $green"[*] Results:$end " $(wc -l tmp-assetfinder)
 }
 
 domain=False
@@ -113,7 +112,7 @@ list=(
 	)
 
 while [ -n "$1" ]; do
-	case "$1" in
+	case $1 in
 		-d|--domain)
 			domain=$2
 			shift ;;
@@ -184,7 +183,6 @@ done
 
 [ $out == False ] && out="alldomains-$domain"
 sort -u tmp-* > $out
-res=$(wc -l $out)
-echo -e $green$bold$Underlined"\n[+] The Final Results:$end $res\n"
+echo -e $green$bold$Underlined"\n[+] The Final Results:$end $(wc -l $out)\n"
 
 [ $delete == True ] && rm tmp-*
