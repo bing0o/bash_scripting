@@ -141,7 +141,6 @@ while [ -n "$1" ]; do
 			shift ;;
 		-k|--keep)
 			delete=False
-			shift;;
 		-h|--help)
 			Usage;;
 		*)
