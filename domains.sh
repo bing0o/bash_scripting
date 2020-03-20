@@ -140,7 +140,7 @@ while [ -n "$1" ]; do
 			out=$2
 			shift ;;
 		-k|--keep)
-			delete=False
+			delete=False ;;
 		-h|--help)
 			Usage;;
 		*)
