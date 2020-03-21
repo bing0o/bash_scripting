@@ -31,7 +31,7 @@ Usage(){
 		printf "%b\n" "$CurLine"
 	done <<-EOF
 		\r            ENCALL ($CurVer)
-		\r            Originally written by bing0o <your E-Mail here>
+		\r            Originally written by bing0o <bingo.noip@gmail.com>
 		\r            Revised by terminalforlife <terminalforlife@yahoo.com>
 
 		\r            A simple Bourne POSIX wrapper for Python script Crypto.
