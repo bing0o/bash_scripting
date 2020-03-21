@@ -16,7 +16,7 @@
 #----------------------------------------------------------------------------------
 #set -x
 #CurVer='2019-12-13'
-CurVer='2020-03-19'
+CurVer='2020-03-21'
 Progrm=${0##*/}
 
 Err(){
@@ -43,7 +43,7 @@ Usage(){
 		\r            --encrypt|-e            - Encrypts one or more files.
 		\r            --decrypt|-d            - Decrypts one or more files.
 		\r            --password|-p STR       - Where STR is the password to use.
-		\r            --depth|-t INT          - Where INT is the Number of depth (Default:1).
+		\r            --depth|-t INT          - Where INT is the Number of depth(Default:1).
 
 		\rSITE:       $Domain/bing0o/bash_scripting
 		\r            $Domain/bing0o/Python-Scripts
@@ -96,27 +96,23 @@ list=()
 path="."
 
 for i in $(seq 1 $num); do
-	#shit
 	path=$path"/*"
 	for i in $path; do
+		if [ "$Action" = '-e' ]; then
+			[ "${i##*.}" = 'hacklab' ] && continue
+		elif [ "$Action" = '-d' ]; then
+			[ "${i##*.}" = 'hacklab' ] || continue
+		fi
 		[ -f "$i" ] && list+=("$i")
 	done
 done
 
-m=1
+c=1
+all=${#list[@]}
 for CurFile in "${list[@]}"; do
-	#[ -f "$CurFile" ] || continue
-
-	# Ignore `*.hacklab` if encrypting, but ignore everything else if decrypting.
-	if [ "$Action" = '-e' ]; then
-		[ "${CurFile##*.}" = 'hacklab' ] && continue
-	elif [ "$Action" = '-d' ]; then
-		[ "${CurFile##*.}" = 'hacklab' ] || continue
-	fi
-
-	printf "[+] %s: %s\n" "$Actioning ($m/${#list[@]})" "$CurFile"
+	printf "[+] %s: %s\n" "$Actioning ($c/$all)" "$CurFile"
 	crypto "$Action" "$CurFile" -p "$Password" -x 1>/dev/null
-	let m+=1
+	let c+=1
 done
 
 printf "[*] Done!\n"
