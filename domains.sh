@@ -7,7 +7,7 @@
 #   * AssetFinder: https://github.com/tomnomnom/assetfinder
 #
 # a perl version is being developed by @terminalforlife 
-# 	* https://github.com/terminalforlife/PerlProjects/tree/master/source/dominator
+#   * https://github.com/terminalforlife/PerlProjects/tree/master/source/dominator
 #
 
 bold="\e[1m"
@@ -17,6 +17,8 @@ green="\e[32m"
 blue="\e[34m"
 #grey="\e[90m"
 end="\e[0m"
+
+PRG=${0##*/}
 
 echo -e $blue$bold"
  ____                        _       _____                       
@@ -41,11 +43,11 @@ Usage(){
 
 #Example:
 	To use a specific Functions:
-		$0 -d hackerone.com -u Findomain,wayback,Subfinder
+		$PRG -d hackerone.com -u Findomain,wayback,Subfinder
 	To exclude a specific Functions:
-		$0 -d hackerone.com -e Amass,Assetfinder
+		$PRG -d hackerone.com -e Amass,Assetfinder
 	To use all the Functions:
-		$0 -d hackerone.com 
+		$PRG -d hackerone.com 
 	"$end
 	exit 1
 }
@@ -72,7 +74,7 @@ bufferover() {
 Findomain() {
 	echo -e $bold"\n[+] Findomain"$end
 	findomain -t $domain -u tmp-findomain &>/dev/null
-	echo -e $green"[*] Results:$end " $(wc -l tmp-findomain)
+	echo -e $green"[*] Results:$end " $(wc -l tmp-findomain 2>/dev/null)
 }
 
 Subfinder() {
