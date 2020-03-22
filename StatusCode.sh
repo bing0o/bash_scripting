@@ -71,6 +71,8 @@ mycurl(){
 			cstatus="\e[34m$status\e[0m"
 		elif [[ "$status" == "4"* ]]; then
 			cstatus="\e[31m$status\e[0m"
+		else
+			cstatus="$status"
 		fi
 	else
 		cstatus="$status"
