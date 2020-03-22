@@ -20,7 +20,7 @@ Usage(){
 		\r      -h, --help         - Displays this Informations and Exit.
 		\r      -v, --version      - Displays The Version
 		\rExample:
-		\r      $PRG -l domains.txt -t 20 -f status.txt
+		\r      $PRG -l domains.txt -t 20 -o status.txt
 		\r
 
 	EOF
