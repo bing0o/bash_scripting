@@ -16,6 +16,7 @@ Usage(){
 		\r      -l, --list         - List of Domains or IPs.
 		\r      -t, --Threads      - Threads number (Default: 5).
 		\r      -o, --output       - The output file to save the results.
+		\r      -n, --nocolor      - Displays the Status code without color.
 		\r      -h, --help         - Displays this Informations and Exit.
 		\r      -v, --version      - Displays The Version
 		\rExample:
@@ -27,7 +28,8 @@ Usage(){
 
 list=False
 threads=5
-out="False"
+out=False
+color=True
 
 while [ -n "$1" ]; do
 	case $1 in
@@ -46,14 +48,14 @@ while [ -n "$1" ]; do
 		-v|--version)
 				printf "$VERSION\n"
 				exit ;;
+		-n|--nocolor)
+				color=False;;
 		*)
 				printf "[-] Error: Unknown Options: $1\n"
 				Usage; exit 1 ;;
 	esac
 	shift
 done
-
-[ "$list" == False ] && { printf "[!] Argument -l/--list is Required!\n"; Usage; exit 1; }
 
 mycurl(){
 	res=$(curl -sk $1 --connect-timeout 10 -w '%{http_code},%{url_effective},%{size_download},%{redirect_url}\n' -o /dev/null)
@@ -62,13 +64,14 @@ mycurl(){
 	size=$(echo $res | awk -F, '{print $3}')
 	redirect=$(echo $res | awk -F, '{print $4}')
 	out=$2
-	
-	if [[ "$status" == "2"* ]]; then 
-		cstatus="\e[32m$status\e[0m"
-	elif [[ "$status" == "3"* ]]; then
-		cstatus="\e[34m$status\e[0m"
-	elif [[ "$status" == "4"* ]]; then
-		cstatus="\e[31m$status\e[0m"
+	if [[ "$3" == True ]]; then
+		if [[ "$status" == "2"* ]]; then 
+			cstatus="\e[32m$status\e[0m"
+		elif [[ "$status" == "3"* ]]; then
+			cstatus="\e[34m$status\e[0m"
+		elif [[ "$status" == "4"* ]]; then
+			cstatus="\e[31m$status\e[0m"
+		fi
 	else
 		cstatus="$status"
 	fi
@@ -77,9 +80,17 @@ mycurl(){
 
 }
 
+
 main(){
-	cat $list | xargs -I{} -P $threads bash -c "mycurl {} $out"
+	cat $list | xargs -I{} -P $threads bash -c "mycurl {} $out $color"
 }
 
-export -f mycurl
-main
+[ "$list" == False ] && { 
+	printf "[!] Argument -l/--list is Required!\n" 
+	Usage 
+	exit 1
+	} || { 
+		export -f mycurl 
+		main 
+	}
+ 
