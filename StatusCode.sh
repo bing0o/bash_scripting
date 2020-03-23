@@ -16,6 +16,7 @@ Usage(){
 		\r      -l, --list         - List of Domains or IPs.
 		\r      -t, --Threads      - Threads number (Default: 5).
 		\r      -o, --output       - The output file to save the results.
+		\r      -p, --path         - To use a specific path ex(/robots.txt).
 		\r      -n, --nocolor      - Displays the Status code without color.
 		\r      -h, --help         - Displays this Informations and Exit.
 		\r      -v, --version      - Displays The Version
@@ -30,16 +31,24 @@ list=False
 threads=5
 out=False
 color=True
+path=False
 
 while [ -n "$1" ]; do
 	case $1 in
 		-l|--list)
+				[ -z "$2" ] && { printf "[-] -l/--list needs a File (list of Domains or IPs)\n"; exit 1; }
 				list=$2
 				shift ;;
 		-t|--threads)
+				[ -z "$2" ] && { printf "[-] -t/--threads needs a number of threads\n"; exit 1; }
 				threads=$2
 				shift ;;
+		-p|--path)
+				[ -z "$2" ] && { printf "[-] -p/--path needs a path ex(/robots.txt)\n"; exit 1; }
+				path=$2
+				shift ;;
 		-o|--output)
+				[ -z "$2" ] && { printf "[-] -o/--output needs a file to write the results to.\n"; exit 1; }
 				out=$2
 				shift ;;
 		-h|--help)
@@ -58,33 +67,40 @@ while [ -n "$1" ]; do
 done
 
 mycurl(){
-	res=$(curl -sk $1 --connect-timeout 10 -w '%{http_code},%{url_effective},%{size_download},%{redirect_url}\n' -o /dev/null)
+	path=$4
+	if [[ "$path" == False ]]; then
+		path="" 
+	elif [[ "$path" != "/"* ]]; then
+		path="/"$path
+	fi
+	res=$(curl -sk $1$path --connect-timeout 10 -w '%{http_code},%{url_effective},%{size_download},%{redirect_url}\n' -o /dev/null)
 	status=$(echo $res | awk -F, '{print $1}')
 	site=$(echo $res | awk -F, '{print $2}')
 	size=$(echo $res | awk -F, '{print $3}')
 	redirect=$(echo $res | awk -F, '{print $4}')
 	out=$2
+	result="$status,$site,$size,$redirect"
 	if [[ "$3" == True ]]; then
 		if [[ "$status" == "2"* ]]; then 
-			cstatus="\e[32m$status\e[0m"
+			cresult="\e[32m$result\e[0m"
 		elif [[ "$status" == "3"* ]]; then
-			cstatus="\e[34m$status\e[0m"
+			cresult="\e[34m$result\e[0m"
 		elif [[ "$status" == "4"* ]]; then
-			cstatus="\e[31m$status\e[0m"
+			cresult="\e[31m$result\e[0m"
 		else
-			cstatus="$status"
+			cresult="$result"
 		fi
 	else
-		cstatus="$status"
+		cresult="$result"
 	fi
-	echo -e "$cstatus,$site,$size,$redirect"
-	[ $out != False ] && echo "$status,$site,$size,$redirect" >> $out
+	echo -e "$cresult"
+	[ $out != False ] && echo "$result" >> $out
 
 }
 
 
 main(){
-	cat $list | xargs -I{} -P $threads bash -c "mycurl {} $out $color"
+	cat $list | xargs -I{} -P $threads bash -c "mycurl {} $out $color $path"
 }
 
 [ "$list" == False ] && { 
