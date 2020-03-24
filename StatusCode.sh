@@ -4,7 +4,7 @@
 #
 
 PRG=${0##*/}
-VERSION="2020-03-22"
+VERSION="2020-03-24"
 
 Usage(){
 	while read -r line; do
@@ -73,19 +73,14 @@ mycurl(){
 	elif [[ "$path" != "/"* ]]; then
 		path="/"$path
 	fi
-	res=$(curl -sk $1$path --connect-timeout 10 -w '%{http_code},%{url_effective},%{size_download},%{redirect_url}\n' -o /dev/null)
-	status=$(echo $res | awk -F, '{print $1}')
-	site=$(echo $res | awk -F, '{print $2}')
-	size=$(echo $res | awk -F, '{print $3}')
-	redirect=$(echo $res | awk -F, '{print $4}')
+	result=$(curl -sk $1$path --connect-timeout 10 -w '%{http_code},%{url_effective},%{size_download},%{redirect_url}\n' -o /dev/null)
 	out=$2
-	result="$status,$site,$size,$redirect"
 	if [[ "$3" == True ]]; then
-		if [[ "$status" == "2"* ]]; then 
+		if [[ "$result" == "2"* ]]; then 
 			cresult="\e[32m$result\e[0m"
-		elif [[ "$status" == "3"* ]]; then
+		elif [[ "$result" == "3"* ]]; then
 			cresult="\e[34m$result\e[0m"
-		elif [[ "$status" == "4"* ]]; then
+		elif [[ "$result" == "4"* ]]; then
 			cresult="\e[31m$result\e[0m"
 		else
 			cresult="$result"
