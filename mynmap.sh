@@ -42,7 +42,7 @@ while [ -n "$1" ]; do
 				out=$2
 				shift ;;
 		-p|--ports)
-				[ -z "$2" ] && { printf "[-] -p/--ports needs a ports number e.g(2000)\n"; exit 1; }
+				[ -z "$2" ] && { printf "[-] -p/--ports, ports e.g(80,443,8080,8443)\n"; exit 1; }
 				ports=$2
 				shift ;;
 		-h|--help)
