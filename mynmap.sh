@@ -15,7 +15,7 @@ Usage(){
 		\r
 		\rOptions:
 		\r      -l, --list         - List of Domains or IPs.
-		\r      -o, --output       - The output file to save the results.
+		\r      -o, --output       - The output Directory to save the results.
 		\r      -p, --ports        - List of Ports (Default:20 ports).
 		\r      -h, --help         - Displays this Informations and Exit.
 		\r      -v, --version      - Displays The Version
