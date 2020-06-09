@@ -77,7 +77,7 @@ mycurl(){
 	title="\e[32m$res\e[0m"
 	url="\e[34m$1\e[0m"
 	echo -e "$url | $title"
-	[ $out != False ] && echo "$result" >> $out
+	[ $out != False ] && echo "$res" >> $out
 
 }
 
