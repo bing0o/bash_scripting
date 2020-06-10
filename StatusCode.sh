@@ -1,22 +1,22 @@
 #!/bin/bash
 #
-# bash script to check for status code, size, title, redirected url, for a list of domains or ips
+# bash script to check for status code, size, redirected url, for a list of domains or ips
 #
 
 PRG=${0##*/}
-VERSION="2020-03-22"
+VERSION="2020-03-24"
 
 Usage(){
 	while read -r line; do
 		printf "%b\n" "$line"
 	done <<-EOF
-		\r$PRG:\t\t - Tool reads a list of Domanis or IPs and gives you: Status Code, Size, Title and redirected link.
+		\r$PRG:\t\t - Tool reads a list of Domanis or IPs and gives you: status code, size and redirected link.
 		\r
 		\rOptions:
 		\r      -l, --list         - List of Domains or IPs.
 		\r      -t, --Threads      - Threads number (Default: 5).
 		\r      -o, --output       - The output file to save the results.
-		\r      -p, --path         - To use a specific path ex(domain.com/robots.txt).
+		\r      -p, --path         - To use a specific path ex(/robots.txt).
 		\r      -n, --nocolor      - Displays the Status code without color.
 		\r      -h, --help         - Displays this Informations and Exit.
 		\r      -v, --version      - Displays The Version
@@ -73,16 +73,14 @@ mycurl(){
 	elif [[ "$path" != "/"* ]]; then
 		path="/"$path
 	fi
-	res=$(curl -sk "$1$path" --connect-timeout 10 -w '%{http_code},%{url_effective},%{size_download},%{redirect_url}\n' -o /dev/null)
-	titles=$(curl --connect-timeout 10 $1$path -so - | grep -iPo '(?<=<title>)(.*)(?=</title>)')
+	result=$(curl -sk $1$path --connect-timeout 10 -w '%{http_code},%{url_effective},%{size_download},%{redirect_url}\n' -o /dev/null)
 	out=$2
-	result="[$status] [$site] [$size] [$titles] [$redirect]"
 	if [[ "$3" == True ]]; then
-		if [[ "$status" == "2"* ]]; then 
+		if [[ "$result" == "2"* ]]; then 
 			cresult="\e[32m$result\e[0m"
-		elif [[ "$status" == "3"* ]]; then
+		elif [[ "$result" == "3"* ]]; then
 			cresult="\e[34m$result\e[0m"
-		elif [[ "$status" == "4"* ]]; then
+		elif [[ "$result" == "4"* ]]; then
 			cresult="\e[31m$result\e[0m"
 		else
 			cresult="$result"
@@ -97,7 +95,7 @@ mycurl(){
 
 
 main(){
-	cat $list | xargs -I{} -P $threads bash -c "mycurl '{}' $out $color $path"
+	cat $list | xargs -I{} -P $threads bash -c "mycurl {} $out $color $path"
 }
 
 [ "$list" == False ] && { 
