@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# bash script to check for status code, size, redirected url, for a list of domains or ips
+# bash script to check for status code, size, redirected url and the Title for a list of domains or ips
 #
 
 PRG=${0##*/}
@@ -10,7 +10,7 @@ Usage(){
 	while read -r line; do
 		printf "%b\n" "$line"
 	done <<-EOF
-		\r$PRG:\t\t - Tool reads a list of Domanis or IPs and gives you: status code, size and redirected link.
+		\r$PRG:\t\t - Tool reads a list of Domanis or IPs and gives you: status code, size, redirected link and the Title.
 		\r
 		\rOptions:
 		\r      -l, --list         - List of Domains or IPs.
@@ -74,6 +74,7 @@ mycurl(){
 		path="/"$path
 	fi
 	result=$(curl -sk $1$path --connect-timeout 10 -w '%{http_code},%{url_effective},%{size_download},%{redirect_url}\n' -o /dev/null)
+	title=$(curl --connect-timeout 10 $1$path -so - | grep -iPo '(?<=<title>)(.*)(?=</title>)')
 	out=$2
 	if [[ "$3" == True ]]; then
 		if [[ "$result" == "2"* ]]; then 
@@ -88,7 +89,7 @@ mycurl(){
 	else
 		cresult="$result"
 	fi
-	echo -e "$cresult"
+	echo -e "$cresult [$title]"
 	[ $out != False ] && echo "$result" >> $out
 
 }
