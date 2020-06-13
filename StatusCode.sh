@@ -90,7 +90,7 @@ mycurl(){
 		cresult="$result"
 	fi
 	echo -e "$cresult [$title]"
-	[ $out != False ] && echo "$result" >> $out
+	[ $out != False ] && echo "$result [$title]" >> $out
 
 }
 
