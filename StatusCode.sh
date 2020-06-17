@@ -73,7 +73,7 @@ mycurl(){
 	elif [[ "$path" != "/"* ]]; then
 		path="/"$path
 	fi
-	result=$(curl -sk $1$path --connect-timeout 10 -w '%{http_code},%{url_effective},%{size_download},%{redirect_url}\n' -o /dev/null)
+	result=$(curl -sk $1$path --connect-timeout 10 -w '%{http_code} %{url_effective} %{size_download} %{redirect_url}\n' -o /dev/null)
 	title=$(curl --connect-timeout 10 $1$path -so - | grep -iPo '(?<=<title>)(.*)(?=</title>)')
 	out=$2
 	if [[ "$3" == True ]]; then
