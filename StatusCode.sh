@@ -15,6 +15,7 @@ Usage(){
 		\rOptions:
 		\r      -l, --list         - List of Domains or IPs.
 		\r      -t, --Threads      - Threads number (Default: 5).
+		\r      -s, --status       - Display only The specified Status Code.
 		\r      -o, --output       - The output file to save the results.
 		\r      -p, --path         - To use a specific path ex(/robots.txt).
 		\r      -n, --nocolor      - Displays the Status code without color.
@@ -29,6 +30,7 @@ Usage(){
 
 list=False
 threads=5
+status=False
 out=False
 color=True
 path=False
@@ -42,6 +44,9 @@ while [ -n "$1" ]; do
 		-t|--threads)
 				[ -z "$2" ] && { printf "[-] -t/--threads needs a number of threads\n"; exit 1; }
 				threads=$2
+				shift ;;
+		-s|--status)
+				status=$2
 				shift ;;
 		-p|--path)
 				[ -z "$2" ] && { printf "[-] -p/--path needs a path ex(/robots.txt)\n"; exit 1; }
@@ -68,6 +73,7 @@ done
 
 mycurl(){
 	path=$4
+	status=$5
 	if [[ "$path" == False ]]; then
 		path="" 
 	elif [[ "$path" != "/"* ]]; then
@@ -89,14 +95,16 @@ mycurl(){
 	else
 		cresult="$result"
 	fi
-	echo -e "$cresult [$title]"
-	[ $out != False ] && echo "$result [$title]" >> $out
+	[[ "$status" == False ]] && echo -e "$cresult [$title]" && [ $out != False ] && echo "$result [$title]" >> $out || {
+		[[ "$result" == "$status"* ]] && echo -e "$cresult [$title]"
+		[ $out != False ] && echo "$result [$title]" >> $out
+	}
 
 }
 
 
 main(){
-	cat $list | xargs -I{} -P $threads bash -c "mycurl {} $out $color $path"
+	cat $list | xargs -I{} -P $threads bash -c "mycurl {} $out $color $path $status"
 }
 
 [ "$list" == False ] && { 
