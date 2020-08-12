@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# Tool Used: https://github.com/dwisiswant0/go-dork
+#
 #[ -z "$1" ] && { printf "[!] google-hacking <DOMAIN>\n"; exit; }
 #
 #
