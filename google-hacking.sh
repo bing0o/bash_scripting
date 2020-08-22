@@ -79,4 +79,4 @@ DORKS(){
 ROOT="google-hacking"
 mkdir $ROOT
 
-[ -z "$1" ] && while read site; do DORKS "$site" || DORKS "$1"
+[ -z "$1" ] && while read site; do DORKS "$site"; done || DORKS "$1"
