@@ -5,6 +5,10 @@
 [![Bash Shell](https://badges.frapsoft.com/bash/v1/bash.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
 bash scripts I use daily to automate some stuff and make linux easier.
+
+## Support
+you can support me here: https://www.buymeacoffee.com/bing0o
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
