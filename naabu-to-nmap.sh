@@ -3,7 +3,7 @@
 # use naabu for full port scan then go deeper with each port using nmap
 # https://github.com/projectdiscovery/naabu
 #
-[ -z "$1" ] && { printf "[!] Usage: ./mynmap.sh <Naabu Results file>\n"; exit; }
+[ -z "$1" ] && { printf "[!] Usage: ./naabu-to-nmap.sh <Naabu Results file>\n"; exit; }
 
 [ -d "nmap-results" ] || mkdir "nmap-results"
 
