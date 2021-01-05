@@ -10,9 +10,11 @@
 list=$(cat "$1" | cut -d ':' -f 1 | sort -u)
 
 count=1
+length=${#list[@]}
+
 for IP in ${list[@]}
 do
-        printf "[+] Scanning ($count)"
+        printf "[+] Scanning ($count/$length)"
         printf "                                        \r"
         ports=$(cat "$1" | grep "$IP" | cut -d ":" -f 2)
         ports=$(echo $ports | tr ' ' ',' ) #awk '{gsub(/\n/,",,",$0); print $0}')
