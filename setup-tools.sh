@@ -17,6 +17,7 @@ sudo apt install -y zsh
 sudo apt install -y wget git
 
 printf "[+] Installing OhMyZsh:\n"
+export RUNZSH=no
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" 
 
 printf "[+] Installing Syntax-Highlighting:\n"
