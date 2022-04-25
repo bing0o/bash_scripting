@@ -1,14 +1,13 @@
 #!/bin/bash
 #
 # Bash script i use to install some hacking tools
-# After installing Oh-My-ZSH, type exit to install the other tools
 #
 
 
 
-#printf "update and upgrade:\n"
-#sudo apt update -y
-#sudo apt upgrade -y
+printf "update and upgrade:\n"
+sudo apt update -y
+sudo apt upgrade -y
 
 
 printf "[*] Setup Your SHELL:\n"
