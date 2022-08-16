@@ -86,4 +86,4 @@ Payload(){
 Payload; echo
 
 
-[ "$RUN" != False ] && printf "\n[+] Staring Netcat Listener:\n" && nc -nvlp $PORT
+[ "$RUN" != False ] && printf "\n[+] Starting Netcat Listener:\n" && nc -nvlp $PORT
