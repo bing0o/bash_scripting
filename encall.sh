@@ -111,7 +111,9 @@ c=1
 all=${#list[@]}
 for CurFile in "${list[@]}"; do
 	printf "[+] %s: %s\n" "$Actioning ($c/$all)" "$CurFile"
-	crypto "$Action" "$CurFile" -p "$Password" -x 1>/dev/null
+	crypto "$Action" "$CurFile" -p "$Password" 1>/dev/null
+ 	# delete the file using shred to make it unrecoverable
+  	shred -n 10 -z --remove "${CurFile}"
 	let c+=1
 done
 
