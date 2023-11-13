@@ -36,7 +36,8 @@ while [ -n "$1" ]; do
 			IP="$2"
 			shift ;;
 		-d|--domain)
-			DOMAIN=True ;;
+			DOMAIN="$2"
+   			shift ;;
 		-t|--type)
 			TYPE="$2"
 			shift ;;
@@ -47,7 +48,8 @@ while [ -n "$1" ]; do
 			KEY="$2"
 			shift ;;
 		-s|--secret)
-			SEC=True ;;
+			SEC="$2"
+   			shift ;;
 		-h|--help)
 			Usage ;;
 		*)
