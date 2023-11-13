@@ -63,7 +63,7 @@ DATA="[{\"data\": \"${IP}\", \"ttl\": 600}]"
 HEADERS="Authorization: sso-key ${KEY}:${SEC}"
 DNS=$(curl -s -XGET -H "$HEADERS" "https://api.godaddy.com/v1/domains/$DOMAIN/records/$TYPE/$NAME" | jq -r '.[].data')
 
-[[ ${IP} =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || echo "[!] Check Your Internet Connection and Try Again!"
+[[ ${IP} =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "[!] Check Your Internet Connection and Try Again!"; exit 1; }
 
 [[ ${IP} == ${DNS} ]] && { echo "[!] Same IP, No Need To Update!"; exit 0; }
 
